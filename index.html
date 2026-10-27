@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TADCU — Episode 3: The Vet</title>
+<style>
+/* ============================================================
+   TADCU — Episode 3 "The Vet"
+   Same production rules as Episodes 1-2:
+   - Hand-authored flat SVG shapes; characters in <defs> symbols.
+   - CSS animations only on elements WITHOUT transform attributes;
+     outer <g> holds position (attribute), inner <g> holds motion
+     (class). Nested wrappers everywhere a transform meets motion.
+   - CSS cannot style inside <use> shadow trees; separately
+     animated parts get their own symbols or scene-level groups.
+   ============================================================ */
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --cream:#f7e9d7; --slate:#5b6670; --brick:#b04a3a;
+  --sheep:#f2ead8; --charcoal:#3a3733; --ink:#2c2a27;
+  --scrub:#6fae9c; --surgery:#efe6d2; --surgeryd:#d7c9ae; --teal:#7fa7b8;
+}
+
+html,body { height:100%; background:#191d1a; font-family:"Trebuchet MS",Verdana,sans-serif; }
+#theatre { height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px; }
+#stage { position:relative; width:min(100%,1600px); aspect-ratio:16/9; background:#20301f; border-radius:14px; overflow:hidden; box-shadow:0 18px 50px rgba(0,0,0,.55); }
+.panel { position:absolute; inset:0; opacity:0; visibility:hidden; }
+.panel.active { opacity:1; visibility:visible; }
+#stage.paused * { animation-play-state:paused !important; }
+svg { display:block; width:100%; height:100%; }
+
+/* ---------- bubbles ---------- */
+.bubble {
+  position:absolute; max-width:34%; background:#fffdf6; color:var(--ink);
+  border:3px solid var(--ink); border-radius:16px; padding:10px 14px;
+  font-family:"Comic Sans MS","Segoe Print","Bradley Hand",cursive;
+  font-size:clamp(10px,1.35vw,21px); line-height:1.25; z-index:6; opacity:0;
+  animation:bubbleShow var(--dur,4s) ease var(--d,0s) both;
+  box-shadow:3px 4px 0 rgba(0,0,0,.18);
+}
+.bubble::after { content:""; position:absolute; left:22%; bottom:-14px; border:7px solid transparent; border-top-color:var(--ink); }
+.bubble i { opacity:.6; font-size:.85em; }
+@keyframes bubbleShow {
+  0%   { opacity:0; transform:scale(.5); }
+  8%   { opacity:1; transform:scale(1.06); }
+  13%  { transform:scale(1); }
+  86%  { opacity:1; transform:scale(1); }
+  100% { opacity:0; transform:scale(.92); }
+}
+
+/* ---------- scenery ---------- */
+.smoke { fill:#e8e8e8; }
+.curl  { animation:curl 5s linear infinite; opacity:0; }
+.curl.b{ animation-delay:-1.7s; } .curl.c{ animation-delay:-3.4s; }
+@keyframes curl {
+  0%{ transform:translate(0,0) scale(.4); opacity:0; }
+  18%{ opacity:.8; }
+  100%{ transform:translate(20px,-80px) scale(1.4); opacity:0; }
+}
+
+/* ---------- characters ---------- */
+.bob   { animation:bob .7s ease-in-out infinite alternate; }
+.bob.b { animation-delay:-.25s; } .bob.c{ animation-delay:-.5s; } .bob.d{ animation-delay:-.12s; }
+.hopHi { animation:hopHi .45s ease-in-out infinite alternate; }
+.hopHi.b{ animation-delay:-.2s; } .hopHi.c{ animation-delay:-.35s; }
+@keyframes hopHi  { from{transform:translateY(0);} to{transform:translateY(-24px);} }
+
+.wag  { animation:wag .5s ease-in-out infinite alternate; transform-origin:10px 34px; }
+@keyframes wag { from{transform:rotate(-16deg);} to{transform:rotate(18deg);} }
+.earPerk { animation:earPerk .7s ease var(--d,0s) both; transform-origin:96px 20px; }
+@keyframes earPerk { 0%,40%{transform:rotate(0);} 60%{transform:rotate(-13deg);} 100%{transform:rotate(0);} }
+.tailWobble { animation:tailWobble .35s ease-in-out infinite alternate; transform-origin:8px 26px; }
+@keyframes tailWobble { from{transform:rotate(4deg);} to{transform:rotate(30deg);} }
+
+.strollIn { animation:strollIn 5.5s ease-in-out .6s both; }
+@keyframes strollIn { from{transform:translate(-240px,540px) scale(1.1);} to{transform:translate(300px,540px) scale(1.1);} }
+.walkL { animation:walkL var(--dur,8s) linear var(--d,0s) both; }
+@keyframes walkL { from{transform:translateX(0);} to{transform:translateX(var(--dx,-1200px));} }
+.exitL { animation:exitL 2.2s ease-in var(--d,0s) both; }
+@keyframes exitL { from{transform:translateX(0);} to{transform:translateX(var(--dx,-1500px));} }
+
+.tadBob { animation:tadBob .55s ease-in-out infinite alternate; }
+@keyframes tadBob { from{transform:translateY(0) rotate(0deg);} to{transform:translateY(-7px) rotate(-2deg);} }
+.capTip { animation:capTip 4s ease 1s both; transform-origin:96px 40px; }
+@keyframes capTip { 0%,30%{transform:rotate(0);} 45%{transform:rotate(-8deg) translateY(-3px);} 60%,100%{transform:rotate(0);} }
+
+.stampDown { animation:stampDown .45s cubic-bezier(.5,0,.5,1) var(--d,0s) both; transform-origin:40px 8px; }
+@keyframes stampDown { 0%,20%{ transform:translateY(-30px) rotate(8deg); opacity:0;} 55% { transform:translateY(0); opacity:1;} 65% { transform:translateY(6px);} 100%{ transform:translateY(0); opacity:1;} }
+
+/* ---------- cards ---------- */
+.t-main { font-family:"Comic Sans MS","Segoe Print",cursive; font-weight:700; fill:var(--cream); letter-spacing:.06em; }
+.rise { animation:rise 1.5s cubic-bezier(.2,1.35,.4,1) var(--d,0s) both; }
+@keyframes rise { from{opacity:0; transform:translateY(70px);} to{opacity:1; transform:translateY(0);} }
+.pop  { animation:pop 1s cubic-bezier(.2,1.6,.4,1) var(--d,0s) both; }
+@keyframes pop { from{opacity:0; transform:scale(.3);} to{opacity:1; transform:scale(1);} }
+
+/* ---------- subtitle & controls ---------- */
+#subBar { position:absolute; left:4%; right:4%; bottom:8.5%; z-index:8; text-align:center; pointer-events:none; }
+#sub { display:inline-block; max-width:88%; background:rgba(18,22,18,.85); color:#fff; padding:8px 16px; border-radius:10px; font-size:clamp(11px,1.6vw,22px); line-height:1.3; font-family:"Comic Sans MS","Segoe Print",cursive; }
+#sub:empty { opacity:0; }
+#sub .who { color:#ffd28a; font-weight:700; margin-right:.45em; text-transform:uppercase; font-size:.78em; letter-spacing:.1em; }
+#ui { width:min(100%,1600px); margin-top:10px; display:grid; grid-template-columns:auto auto 1fr auto auto; gap:10px; align-items:center; color:#cfd8cf; font-size:13px; }
+#ui button { background:#2c342c; color:#e8eee6; border:1px solid #465046; border-radius:8px; width:46px; height:34px; cursor:pointer; font-size:14px; }
+#ui button:hover { background:#39503a; }
+#bar { height:10px; background:#2c342c; border-radius:6px; overflow:hidden; cursor:pointer; }
+#fill { height:100%; width:0%; background:linear-gradient(90deg,#67a568,#b04a3a); }
+#lbl { min-width:250px; text-align:right; opacity:.85; white-space:nowrap; }
+#hint { color:#9aa79a; font-size:12px; margin-top:6px; }
+</style>
+</head>
+<body>
+<div id="theatre">
+  <div id="stage">
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <g id="sheep-shape">
+          <rect x="24" y="42" width="7" height="20" rx="3" fill="#3a3733"/>
+          <rect x="36" y="44" width="7" height="18" rx="3" fill="#3a3733"/>
+          <rect x="60" y="44" width="7" height="18" rx="3" fill="#3a3733"/>
+          <rect x="71" y="42" width="7" height="20" rx="3" fill="#3a3733"/>
+          <ellipse cx="51" cy="33" rx="33" ry="18" fill="#f2ead8"/>
+          <circle cx="26" cy="22" r="9" fill="#f2ead8"/><circle cx="42" cy="16" r="10" fill="#f2ead8"/>
+          <circle cx="58" cy="16" r="10" fill="#f2ead8"/><circle cx="74" cy="22" r="9" fill="#f2ead8"/>
+          <ellipse cx="86" cy="26" rx="10" ry="8.5" fill="#3a3733"/>
+          <path d="M80 18 q-7 -8 -12 -2" stroke="#3a3733" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <circle cx="89" cy="24" r="2.1" fill="#fff"/><circle cx="89" cy="24" r="1" fill="#000"/>
+          <circle cx="17" cy="27" r="4.5" fill="#e4dccb"/>
+        </g>
+        <g id="sheep-dott">
+          <rect x="24" y="42" width="7" height="20" rx="3" fill="#3a3733"/>
+          <rect x="36" y="44" width="7" height="18" rx="3" fill="#3a3733"/>
+          <rect x="60" y="44" width="7" height="18" rx="3" fill="#3a3733"/>
+          <rect x="71" y="42" width="7" height="20" rx="3" fill="#3a3733"/>
+          <ellipse cx="51" cy="33" rx="33" ry="18" fill="#f2ead8"/>
+          <circle cx="36" cy="30" r="6" fill="#3a3733" opacity=".8"/>
+          <circle cx="60" cy="40" r="5" fill="#3a3733" opacity=".8"/>
+          <circle cx="70" cy="24" r="4.5" fill="#3a3733" opacity=".8"/>
+          <circle cx="44" cy="20" r="5" fill="#3a3733" opacity=".8"/>
+          <ellipse cx="86" cy="26" rx="10" ry="8.5" fill="#3a3733"/>
+          <path d="M80 18 q-7 -8 -12 -2" stroke="#3a3733" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <circle cx="89" cy="24" r="2.1" fill="#fff"/><circle cx="89" cy="24" r="1" fill="#000"/>
+        </g>
+
+        <!-- Tadcu -->
+        <g id="tadcu">
+          <rect x="46" y="150" width="13" height="40" rx="5" fill="#5b6670"/>
+          <rect x="67" y="150" width="13" height="40" rx="5" fill="#5b6670"/>
+          <ellipse cx="50" cy="192" rx="12" ry="7" fill="#2c2a27"/>
+          <ellipse cx="77" cy="192" rx="12" ry="7" fill="#2c2a27"/>
+          <path d="M35 72 q0 -28 30 -28 q30 0 30 28 v82 q0 10 -12 10 h-36 q-12 0 -12 -10 z" fill="#b04a3a"/>
+          <rect x="48" y="106" width="34" height="9" rx="3" fill="#8d3a2d"/>
+          <circle cx="64" cy="126" r="4" fill="#8d3a2d"/><circle cx="64" cy="140" r="4" fill="#8d3a2d"/>
+          <path d="M38 84 q-18 22 -22 50" stroke="#c96a55" stroke-width="11" fill="none" stroke-linecap="round"/>
+          <path d="M18 136 l-22 48" stroke="#7a5230" stroke-width="7" stroke-linecap="round"/>
+          <circle cx="-5" cy="182" r="6" fill="#e9c39a"/>
+          <circle cx="98" cy="46" r="27" fill="#eebd93"/>
+          <path d="M72 44 q0 40 26 40 q26 0 26 -40 q-13 12 -26 12 q-13 0 -26 -12 z" fill="#d8d5d1"/>
+          <path d="M87 55 q11 -9 22 0 q-11 9 -22 0 z" fill="#e4e1de"/>
+          <circle cx="85" cy="47" r="3.4" fill="#2c2a27"/><circle cx="111" cy="47" r="3.4" fill="#2c2a27"/>
+          <path d="M96 48 l6 6 l-12 0 q0 6 3 8" stroke="#e5956f" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <circle cx="76" cy="52" r="6" fill="#e5956f" opacity=".45"/>
+          <circle cx="120" cy="52" r="6" fill="#e5956f" opacity=".45"/>
+          <path d="M70 38 q0 -30 28 -30 q28 0 28 30 q-14 -9 -28 -9 q-14 0 -28 9 z" fill="#b04a3a"/>
+          <rect x="66" y="38" width="64" height="9" rx="4" fill="#8d3a2d"/>
+          <g>
+            <path d="M82 86 q22 18 28 32" stroke="#c96a55" stroke-width="11" fill="none" stroke-linecap="round"/>
+            <circle cx="111" cy="120" r="7" fill="#e9c39a"/>
+            <rect x="102" y="104" width="20" height="16" rx="3" fill="#e8e8e8"/>
+            <path d="M122 108 q9 4 0 10" stroke="#e8e8e8" stroke-width="4" fill="none"/>
+            <circle cx="112" cy="100" r="2.5" fill="#b8cfe2"/>
+          </g>
+        </g>
+
+        <!-- Bryn -->
+        <g id="bryn">
+          <ellipse cx="54" cy="42" rx="36" ry="15" fill="#2c2a27"/>
+          <ellipse cx="48" cy="52" rx="18" ry="8" fill="#f2ead8"/>
+          <rect x="32" y="50" width="7" height="13" rx="3" fill="#2c2a27"/>
+          <rect x="46" y="52" width="7" height="11" rx="3" fill="#2c2a27"/>
+          <rect x="60" y="52" width="7" height="11" rx="3" fill="#2c2a27"/>
+          <rect x="70" y="50" width="7" height="13" rx="3" fill="#2c2a27"/>
+        </g>
+        <g id="bryn-tail">
+          <path d="M10 38 q-12 -2 -14 -14" stroke="#2c2a27" stroke-width="8" fill="none" stroke-linecap="round"/>
+        </g>
+        <g id="bryn-head">
+          <path d="M76 24 q13 -9 22 1 q7 8 3 17 q-4 9 -15 9 l-14 -2 z" fill="#2c2a27"/>
+          <path d="M80 28 q11 -5 15 4 q-9 9 -16 2 z" fill="#f2ead8"/>
+          <path d="M86 44 q5 6 13 4" stroke="#e58a97" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <circle cx="91" cy="23" r="2.4" fill="#fff"/>
+          <path d="M95 13 l7 -12" stroke="#2c2a27" stroke-width="6" stroke-linecap="round"/>
+        </g>
+        <!-- Bryn's victorious bandana -->
+        <g id="bandana">
+          <path d="M78 34 L104 40 L80 48 z" fill="#b04a3a"/>
+          <path d="M78 34 q4 8 2 14" stroke="#8d3a2d" stroke-width="3" fill="none"/>
+        </g>
+
+        <!-- Dilys the vet -->
+        <g id="dilys">
+          <rect x="46" y="150" width="12" height="42" rx="5" fill="#4f8476"/>
+          <rect x="66" y="150" width="12" height="42" rx="5" fill="#4f8476"/>
+          <ellipse cx="49" cy="194" rx="11" ry="7" fill="#2c2a27"/>
+          <ellipse cx="76" cy="194" rx="11" ry="7" fill="#2c2a27"/>
+          <path d="M36 76 q0 -26 29 -26 q29 0 29 26 v80 q0 10 -12 10 h-34 q-12 0 -12 -10 z" fill="#6fae9c"/>
+          <path d="M60 50 h30 l-4 10 h-22 z" fill="#e9f4ef"/>
+          <rect x="46" y="88" width="10" height="40" rx="4" fill="#4f8476"/>
+          <path d="M40 78 q-12 12 -14 30" stroke="#5f9d8d" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <circle cx="26" cy="110" r="6" fill="#eec7a3"/>
+          <path d="M38 62 q28 4 54 -4" stroke="#2c2a27" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <circle cx="42" cy="78" r="6" fill="#2c2a27"/>
+          <circle cx="98" cy="38" r="25" fill="#eec7a3"/>
+          <path d="M74 32 q0 -32 24 -32 q24 0 24 30 l0 22 q-2 -16 -20 -18 q-18 -2 -24 16 q-4 -10 -4 -18z" fill="#4a3b35"/>
+          <path d="M118 4 q14 4 10 22" stroke="#4a3b35" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <circle cx="88" cy="42" r="2.6" fill="#2c2a27"/><circle cx="108" cy="42" r="2.6" fill="#2c2a27"/>
+          <path d="M92 55 q7 5 14 1" stroke="#c96a55" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <circle cx="78" cy="50" r="7" fill="#f0ac8e" opacity=".45"/><circle cx="116" cy="50" r="7" fill="#f0ac8e" opacity=".45"/>
+        </g>
+
+        <!-- clipboard -->
+        <g id="clipboard">
+          <rect x="-20" y="-30" width="40" height="54" rx="4" fill="#a9803f"/>
+          <rect x="-16" y="-24" width="32" height="42" rx="2" fill="#fffdf6"/>
+          <path d="M-10 -16 h20 M-10 -8 h20 M-10 0 h14" stroke="#8b8478" stroke-width="2.5"/>
+          <rect x="-8" y="-34" width="16" height="8" rx="3" fill="#5b6670"/>
+        </g>
+
+        <!-- the ledger (open book) -->
+        <g id="ledger">
+          <rect x="0" y="0" width="120" height="86" fill="#8d3a2d"/>
+          <rect x="6" y="6" width="52" height="74" fill="#fffdf6"/>
+          <rect x="62" y="6" width="52" height="74" fill="#fffdf6"/>
+          <path d="M12 18 h40 M12 30 h40 M12 42 h40" stroke="#8b8478" stroke-width="3"/>
+          <path d="M68 18 h40 M68 30 h40" stroke="#8b8478" stroke-width="3"/>
+          <text x="70" y="62" font-size="26" font-weight="700" fill="#b04a3a" font-family="Comic Sans MS, cursive">£40</text>
+        </g>
+
+        <!-- paw print, the signature -->
+        <g id="pawp">
+          <ellipse cx="0" cy="0" rx="15" ry="12" fill="#2c2a27"/>
+          <ellipse cx="-16" cy="-14" rx="5.5" ry="7" fill="#2c2a27"/>
+          <ellipse cx="-6" cy="-19" rx="5.5" ry="7" fill="#2c2a27"/>
+          <ellipse cx="6" cy="-19" rx="5.5" ry="7" fill="#2c2a27"/>
+          <ellipse cx="16" cy="-14" rx="5.5" ry="7" fill="#2c2a27"/>
+        </g>
+
+        <!-- cat in basket, wrapped as a portable grudge -->
+        <g id="basket-cat">
+          <rect x="0" y="34" width="90" height="26" rx="8" fill="#a9803f"/>
+          <rect x="0" y="34" width="90" height="26" rx="8" fill="none" stroke="#7a5230" stroke-width="5"/>
+          <path d="M22 36 q26 -22 52 0 q-26 10 -52 0z" fill="#f7e9d7"/>
+          <path d="M30 20 l6 -12 l8 12 z" fill="#8d8478"/>
+          <path d="M50 20 l6 -12 l8 12 z" fill="#8d8478"/>
+          <circle cx="43" cy="24" r="2" fill="#2c2a27"/><circle cx="55" cy="24" r="2" fill="#2c2a27"/>
+          <path d="M70 34 q16 -2 10 -14" stroke="#8d8478" stroke-width="6" fill="none" stroke-linecap="round"/>
+        </g>
+
+        <!-- rabbit poster -->
+        <g id="poster">
+          <rect x="0" y="0" width="120" height="150" fill="#fffdf6"/>
+          <rect x="0" y="0" width="120" height="150" fill="none" stroke="#a9803f" stroke-width="6"/>
+          <ellipse cx="60" cy="92" rx="34" ry="26" fill="#e4dccb"/>
+          <path d="M46 66 q-4 -34 8 -36 q12 2 6 36 z" fill="#e4dccb"/>
+          <path d="M62 66 q-2 -34 8 -34 q10 4 4 34 z" fill="#e4dccb"/>
+          <circle cx="52" cy="88" r="2.5" fill="#2c2a27"/><circle cx="68" cy="88" r="2.5" fill="#2c2a27"/>
+          <path d="M58 96 q2 6 -2 10" stroke="#e5956f" stroke-width="3" fill="none"/>
+          <path d="M28 96 l18 4 M92 96 l-18 4" stroke="#8b8478" stroke-width="2"/>
+          <path d="M20 16 q40 18 80 0" stroke="#8b8478" stroke-width="4" fill="none"/>
+          <path d="M26 28 q34 14 68 0" stroke="#8b8478" stroke-width="4" fill="none"/>
+          <text x="60" y="140" font-size="13" text-anchor="middle" fill="#8b8478" font-family="Comic Sans MS, cursive">RAISED ON CARROTS</text>
+        </g>
+
+        <!-- clinic chair -->
+        <g id="chair">
+          <path d="M0 0 h64 v14 h-64 z" fill="#5b6670"/>
+          <path d="M0 -40 v40 M64 -34 v34" stroke="#465046" stroke-width="8" fill="none"/>
+          <rect x="0" y="56" width="64" height="10" rx="4" fill="#465046"/>
+          <rect x="6" y="66" width="8" height="30" fill="#465046"/>
+          <rect x="50" y="66" width="8" height="30" fill="#465046"/>
+        </g>
+        <!-- the gurney for examinations -->
+        <g id="gurney">
+          <path d="M0 0 h180 v18 h-180 z" fill="#5b6670"/>
+          <path d="M10 18 v56 M170 18 v56" stroke="#465046" stroke-width="10"/>
+          <circle cx="14" cy="80" r="7" fill="#2c2a27"/><circle cx="166" cy="80" r="7" fill="#2c2a27"/>
+          <rect x="-8" y="-12" width="196" height="12" rx="6" fill="#465046"/>
+        </g>
+        <!-- the biscuit tin (as a legend) -->
+        <g id="tin">
+          <ellipse cx="0" cy="0" rx="34" ry="16" fill="#5b6670"/>
+          <rect x="-34" y="-34" width="68" height="30" rx="8" fill="#5b6670"/>
+          <rect x="-30" y="-30" width="60" height="8" rx="4" fill="#b04a3a"/>
+        </g>
+      </defs>
+    </svg>
+
+    <!-- ================= TITLE CARD ================= -->
+    <section class="panel" id="p-title">
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+        <defs><linearGradient id="dawn3" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#f5b26b"/><stop offset=".6" stop-color="#e58f6a"/><stop offset="1" stop-color="#7d5f74"/>
+        </linearGradient></defs>
+        <rect width="1600" height="900" fill="url(#dawn3)"/>
+        <circle cx="1120" cy="620" r="120" fill="#ffe9a8"/>
+        <path d="M0 640 Q400 480 800 660 T1600 600 V900 H0 z" fill="#5d5468"/>
+        <path d="M0 700 Q500 560 1000 740 Q1300 830 1600 760 V900 H0 z" fill="#3f4a45"/>
+        <use href="#sheep-shape" x="220" y="700"/>
+        <use href="#sheep-shape" x="360" y="742"/>
+        <text class="t-main rise" x="800" y="380" font-size="200" text-anchor="middle">TADCU</text>
+        <text class="t-main rise" style="--d:.9s; fill:#2c2a27" x="800" y="470" font-size="44" text-anchor="middle">in  “The Vet”</text>
+        <text class="t-main pop" style="--d:2.1s; fill:#fff3d6" x="800" y="560" font-size="40" text-anchor="middle">Y Milfeddyg!</text>
+      </svg>
+      <div class="bubble" style="--d:.5s; left:39%; top:8%; max-width:24%;">
+        Ep. 3 · production run “test03” · Cwm Twp production unit
+      </div>
+    </section>
+
+    <!-- ============ SCENE 1 : THE WAITING ROOM ============ -->
+    <section class="panel" id="p-s1">
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+        <rect width="1600" height="900" fill="#7fa7b8"/>
+        <rect x="0" y="620" width="1600" height="280" fill="#d7c9ae"/>
+        <rect x="0" y="620" width="1600" height="18" fill="#c3b294"/>
+        <!-- wall posters + clock -->
+        <use href="#poster" x="240" y="120"/>
+        <circle cx="1440" cy="170" r="54" fill="#fffdf6"/>
+        <circle cx="1440" cy="170" r="54" fill="none" stroke="#465046" stroke-width="6"/>
+        <path d="M1440 170 L1440 132 M1440 170 L1466 182" stroke="#2c2a27" stroke-width="5"/>
+        <path d="M120 120 h260 M120 146 h180" stroke="#c9b98f" stroke-width="6"/>
+        <!-- chairs -->
+        <use href="#chair" x="180" y="554"/>
+        <use href="#chair" x="330" y="554"/>
+        <use href="#chair" x="480" y="554"/>
+        <!-- the cat, guests' best enemy -->
+        <g transform="translate(1000,560)">
+          <use href="#basket-cat"/>
+        </g>
+        <!-- Bryn, statue -->
+        <g transform="translate(330,518) scale(1.35)">
+          <g class="earPerk" style="--d:8.6s"><use href="#bryn"/><use href="#bryn-head"/></g>
+        </g>
+        <!-- Tadcu reads Goat Weekly -->
+        <g transform="translate(620,400) scale(1.5)">
+          <g class="tadBob" style="animation:none"><use href="#tadcu"/></g>
+        </g>
+        <!-- the magazine -->
+        <g transform="translate(770,545)">
+          <rect x="0" y="0" width="90" height="120" rx="6" fill="#5b6670"/>
+          <rect x="6" y="6" width="78" height="108" rx="4" fill="#f2ead8"/>
+          <text x="45" y="34" font-size="16" font-weight="700" text-anchor="middle" fill="#b04a3a" font-family="Comic Sans MS, cursive">GOAT</text>
+          <text x="45" y="52" font-size="16" font-weight="700" text-anchor="middle" fill="#b04a3a" font-family="Comic Sans MS, cursive">WEEKLY</text>
+          <path d="M16 70 h56 M16 82 h40 M16 94 h46" stroke="#8b8478" stroke-width="4"/>
+        </g>
+        <!-- doors at the back -->
+        <rect x="1000" y="330" width="150" height="290" fill="#4f8476"/>
+        <rect x="1180" y="330" width="150" height="290" fill="#4f8476"/>
+        <circle cx="1120" cy="480" r="7" fill="#f7e9d7"/><circle cx="1300" cy="480" r="7" fill="#f7e9d7"/>
+        <!-- Bryn imagined biscuit tin, drifting like a food heaven -->
+        <g class="bob" style="animation:none" transform="translate(1240,600)">
+          <use href="#tin" opacity=".9"/>
+        </g>
+      </svg>
+      <div class="bubble" style="--d:.8s; --dur:3.8s; left:52%; top:8%;"><b>Narrator</b>&nbsp;At the vet’s, for once, the queue was small: one cat that hated everybody — and us.</div>
+      <div class="bubble" style="--d:5s; --dur:3.6s; left:44%; top:52%;"><b>Tadcu</b>&nbsp;Reminders, Bryn: wag if it hurts, sit brave if it doesn’t — and STOP eyeing my thermos.</div>
+      <div class="bubble" style="--d:9s; --dur:2.4s; left:20%; top:34%;"><b>Bryn</b>&nbsp;<i>(stone-faced. professional.)</i></div>
+      <div class="bubble" style="--d:11.4s; --dur:2.6s; left:56%; top:30%;"><b>THE CAT</b>&nbsp;<i>(hisses at BOTH of them)</i></div>
+    </section>
+
+    <!-- ============ SCENE 2 : THE EXAMINATION ============ -->
+    <section class="panel" id="p-s2">
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+        <rect width="1600" height="900" fill="#efe6d2"/>
+        <rect x="0" y="0" width="1600" height="60" fill="#d7c9ae"/>
+        <!-- medical shelves -->
+        <rect x="90" y="180" width="600" height="14" fill="#c3b294"/>
+        <g transform="translate(110,120) scale(.8)"><use href="#tin"/></g>
+        <!-- gurney -->
+        <g transform="translate(380,560)"><use href="#gurney"/></g>
+        <!-- Bryn on the gurney, comically at attention -->
+        <g transform="translate(410,478) scale(1.25)">
+          <g class="earPerk" style="--d:5.2s"><use href="#bryn"/><use href="#bryn-head"/><use class="wag" href="#bryn-tail"/></g>
+        </g>
+        <!-- tail wagging so hot the stethoscope reports it -->
+        <g transform="translate(446,472)">
+          <path d="M0 0 q30 -10 40 -30" stroke="#b04a3a" stroke-width="4" fill="none" stroke-dasharray="8 9" opacity=".8"/>
+        </g>
+        <!-- Dilys, listening gravely -->
+        <g transform="translate(900,240) scale(1.7)">
+          <g class="earPerk" style="--d:3s"><use href="#dilys"/></g>
+        </g>
+        <!-- the clipboard in her hand -->
+        <g transform="translate(1180,420)" class2="">
+          <use href="#clipboard"/>
+        </g>
+        <!-- Tadcu, front and center -->
+        <g transform="translate(90,240) scale(1.6)">
+          <g class="capTip"><g class="tadBob" style="animation:none"><use href="#tadcu"/></g></g>
+        </g>
+        <!-- floor scales, checked before and after -->
+        <g transform="translate(1240,760) scale(1.4)"><use href="#scales"/></g>
+        <!-- a print measuring wall -->
+        <g transform="translate(100,60)">
+          <rect x="0" y="0" width="8" height="440" fill="#c3b294"/>
+          <path d="M8 40 h44 M8 110 h44 M8 180 h44 M8 250 h44 M8 320 h44" stroke="#c3b294" stroke-width="5"/>
+          <text x="60" y="44" font-size="18" fill="#8b8478" font-family="Comic Sans MS, cursive">34 kg</text>
+          <text x="60" y="114" font-size="18" fill="#8b8478" font-family="Comic Sans MS, cursive">33 kg</text>
+        </g>
+      </svg>
+      <div class="bubble" style="--d:.8s; --dur:3.4s; left:52%; top:6%;"><b>Narrator</b>&nbsp;In she came: Dilys — vet, dispenser of truths, bringer of needles.</div>
+      <div class="bubble" style="--d:4.6s; --dur:4s; left:50%; top:32%;"><b>Dilys</b>&nbsp;Heart of a lion, this one. Fit — unless the tail’s a problem, and tails don’t.</div>
+      <div class="bubble" style="--d:9.2s; --dur:3.2s; left:6%; top:8%;"><b>Tadcu</b>&nbsp;Thirty-four kilograms?! He was thirty-three last week. Someone has found the biscuit tin.</div>
+      <div class="bubble" style="--d:12.6s; --dur:2.4s; left:44%; top:60%;"><b>Narrator</b>&nbsp;Bryn walked out mid-examination. Confidence, is what that’s called.</div>
+    </section>
+
+    <!-- ============ SCENE 3 : THE BILL ============ -->
+    <section class="panel" id="p-s3">
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+        <rect width="1600" height="900" fill="#efe6d2"/>
+        <rect x="0" y="0" width="1600" height="60" fill="#d7c9ae"/>
+        <!-- desk -->
+        <rect x="0" y="430" width="1600" height="30" fill="#a9803f"/>
+        <rect x="0" y="452" width="1600" height="448" fill="#7a5230"/>
+        <!-- the ledger -->
+        <g transform="translate(700,340) scale(1.2)"><use href="#ledger"/></g>
+        <!-- the paw stamp, descending onto the ledger -->
+        <g transform="translate(830,330) scale(1.1)">
+          <g class="stampDown" style="--d:10s"><use href="#pawp" opacity=".85"/></g>
+        </g>
+        <!-- Dilys behind desk -->
+        <g transform="translate(1120,150) scale(1.65)">
+          <g class="earPerk" style="--d:7s"><use href="#dilys"/></g>
+        </g>
+        <g transform="translate(1330,340)">
+          <g class="bob" style="animation:none"><use href="#clipboard"/></g>
+        </g>
+        <!-- Tadcu -->
+        <g transform="translate(220,190) scale(1.65)">
+          <g class="tadBob" style="animation:none"><use href="#tadcu"/></g>
+        </g>
+        <!-- His counter-offer, drawn as a shopping list -->
+        <g transform="translate(360,540)">
+          <rect x="0" y="0" width="300" height="190" rx="6" fill="#fffdf6"/>
+          <path d="M18 26 h264 M18 54 h264 M18 82 h264 M18 110 h200" stroke="#8b8478" stroke-width="4"/>
+          <path d="M18 138 q10 -6 20 0 l10 6" stroke="#8b8478" stroke-width="4" fill="none"/>
+          <text x="24" y="176" font-size="22" font-weight="700" fill="#b04a3a" font-family="Comic Sans MS, cursive">or nearly free</text>
+        </g>
+        <!-- biscuit tin, for reference, still watching -->
+        <g class="bob" style="animation:none" transform="translate(1350,600)">
+          <use href="#tin" opacity=".85"/>
+        </g>
+      </svg>
+      <div class="bubble" style="--d:.8s; --dur:2.8s; left:52%; top:4%;"><b>Narrator</b>&nbsp;The bill, said Dilys, was forty pounds.</div>
+      <div class="bubble" style="--d:3.6s; --dur:3.4s; left:6%; top:36%;"><b>Tadcu</b>&nbsp;Or — hear me out — tea for two, twelve eggs, and my personal thank-you.</div>
+      <div class="bubble" style="--d:7.2s; --dur:2.6s; left:58%; top:38%;"><b>Dilys</b>&nbsp;<i>(a silence with an outline)</i></div>
+      <div class="bubble" style="--d:10s; --dur:2.6s; left:52%; top:64%;"><b>Narrator</b>&nbsp;Silence, then. The loudest kind.</div>
+      <div class="bubble" style="--d:12.6s; --dur:2.4s; left:50%; top:12%;"><b>Dilys</b>&nbsp;Paw print. On the ledger. NOW.</div>
+    </section>
+
+    <!-- ============ SCENE 4 : THE PARADE ============ -->
+    <section class="panel" id="p-s4">
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+        <defs><linearGradient id="dusk3" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ee9b6f"/><stop offset=".7" stop-color="#6d5a72"/><stop offset="1" stop-color="#41505a"/>
+        </linearGradient></defs>
+        <rect width="1600" height="900" fill="url(#dusk3)"/>
+        <path d="M0 520 Q500 380 1000 540 Q1320 630 1600 560 V900 H0 z" fill="#3f5a48"/>
+        <path d="M0 660 Q700 560 1600 640 V900 H0 z" fill="#31503e"/>
+        <path d="M0 780 Q800 700 1600 760 V900 H0 z" fill="#2a4234"/>
+        <!-- Bryn on the thermos cushion, in the bandana -->
+        <g class="walkL" style="--dur:10s; --dx:-1700px">
+          <g transform="translate(1740,600) scale(1.4)">
+            <g class="tadBob" style="animation:none"><use href="#tadcu"/></g>
+            <g transform="translate(80,110) scale(.9)"><use href="#thermos" style="display:none"/></g>
+            <g transform="translate(168,44) scale(.6)">
+              <use href="#bryn"/><use href="#bryn-head"/><use href="#bandana"/>
+              <use class="wag" href="#bryn-tail"/>
+            </g>
+          </g>
+        </g>
+        <!-- the urn, the lamb cushions gone, the tin of biscuits, FOR REFERENCE -->
+        <g class="bob" style="animation:none" transform="translate(300,690)"><use href="#tin" opacity=".9"/></g>
+        <!-- the girls, applauding with whatever they have -->
+        <g transform="translate(600,470) scale(.9)"><g class="hopHi"><use href="#sheep-shape"/></g></g>
+        <g transform="translate(760,430) scale(.9)"><g class="hopHi b"><use href="#sheep-shape"/></g></g>
+        <g transform="translate(940,480) scale(.86)"><g class="hopHi c"><use href="#sheep-dott"/></g></g>
+        <g transform="translate(1120,450) scale(.9)"><g class="hopHi"><use href="#sheep-shape"/></g></g>
+        <g transform="translate(1300,490) scale(.86)"><g class="hopHi b"><use href="#sheep-shape"/></g></g>
+      </svg>
+      <div class="bubble" style="--d:1.2s; --dur:3.6s; left:6%; top:8%;"><b>Narrator</b>&nbsp;For the record: settled, in paw.</div>
+      <div class="bubble" style="--d:4.6s; --dur:3.6s; left:40%; top:40%;"><b>Tadcu</b>&nbsp;Diolch, Dilys! And no biscuits till Monday, mind.</div>
+      <div class="bubble" style="--d:8.4s; --dur:3.4s; left:52%; top:10%;"><b>Narrator</b>&nbsp;And the County Herald headline wrote itself: BRYN BEATS THE NEEDLE.</div>
+      <div class="bubble" style="--d:12s; --dur:2.6s; left:64%; top:26%;"><b>Dilys</b>&nbsp;NEXT!</div>
+    </section>
+
+    <!-- ================= END CARD ================= -->
+    <section class="panel" id="p-end">
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+        <rect width="1600" height="900" fill="#23281f"/>
+        <text class="t-main pop" x="800" y="360" font-size="130" text-anchor="middle">THE END</text>
+        <text class="t-main rise" style="--d:1s; fill:#8fae8f" x="800" y="150" font-size="44" text-anchor="middle">Cwm Twp production unit · test03</text>
+        <text class="t-main rise" style="--d:1.8s; fill:#cfd8cf" x="800" y="450" font-size="32" text-anchor="middle">Next episode: Tadcu builds a wall so good the girls can’t get in —</text>
+        <text class="t-main rise" style="--d:2.2s; fill:#cfd8cf" x="800" y="496" font-size="32" text-anchor="middle">and Cwm Twp learns about chisels. Ymlaen!</text>
+        <g transform="translate(660,560) scale(1.4)"><g class="bob"><use href="#sheep-shape"/></g></g>
+        <g transform="translate(880,600) scale(1.3)"><g class="bob b"><use href="#sheep-dott"/></g></g>
+        <text class="t-main pop" style="--d:3s" x="800" y="820" font-size="40" text-anchor="middle">Nos da.</text>
+      </svg>
+    </section>
+
+    <div id="subBar"><div id="sub"></div></div>
+  </div>
+
+  <div id="ui">
+    <button id="bPlay" title="Play / pause">▶</button>
+    <button id="bRestart" title="Restart">⟲</button>
+    <div id="bar"><div id="fill"></div></div>
+    <button id="bSkip" title="Next scene">⏭</button>
+    <span id="lbl">Ready — press play</span>
+  </div>
+  <div id="hint">Keyboard: space = play/pause · → = next scene · 1–7 = jump to a scene · click the bar to scrub by scene.</div>
+</div>
+
+<script>
+/* ================= TIMELINE ================= */
+const SCENES = [
+  { id:"p-title", name:"Title", dur:5.5,
+    subs:[ {t:.8, who:"Tadcu", x:"The gate is latched. The girls are IN. And today, Bryn sees a doctor."} ] },
+  { id:"p-s1", name:"The Waiting Room", dur:14,
+    subs:[
+      {t:.6,  who:"Narrator", x:"At the vet’s, for once, the queue was small: one cat that hated everybody — and us."},
+      {t:4.6, who:"Tadcu",   x:"Reminders, Bryn: wag if it hurts, sit brave if it doesn’t — and STOP eyeing my thermos."},
+      {t:8.8, who:"Bryn",    x:"(stone-faced. professional.)"},
+      {t:11.2,who:"THE CAT", x:"(hisses at BOTH of them)"} ] },
+  { id:"p-s2", name:"The Examination", dur:15,
+    subs:[
+      {t:.8,  who:"Narrator", x:"In she came: Dilys — vet, dispenser of truths, bringer of needles."},
+      {t:4.6, who:"Dilys",   x:"Heart of a lion, this one. Fit — unless the tail’s a problem, and tails don’t."},
+      {t:9.2, who:"Tadcu",   x:"Thirty-four kilograms?! He was thirty-three last week. Someone has found the biscuit tin."},
+      {t:12.6,who:"Narrator", x:"Bryn walked out mid-examination. Confidence, is what that’s called."} ] },
+  { id:"p-s3", name:"The Bill", dur:14,
+    subs:[
+      {t:.8,  who:"Narrator", x:"The bill, said Dilys, was forty pounds."},
+      {t:3.6, who:"Tadcu",   x:"Or — hear me out — tea for two, twelve eggs, and my personal thank-you."},
+      {t:7.2, who:"Dilys",   x:"(a silence with an outline)"},
+      {t:10,  who:"Narrator", x:"Silence, then. The loudest kind."},
+      {t:12.6,who:"Dilys",   x:"Paw print. On the ledger. NOW."} ] },
+  { id:"p-s4", name:"The Parade", dur:13,
+    subs:[
+      {t:1.2, who:"Narrator", x:"For the record: settled, in paw."},
+      {t:4.6, who:"Tadcu",   x:"Diolch, Dilys! And no biscuits till Monday, mind."},
+      {t:8.4, who:"Narrator", x:"And the County Herald headline wrote itself: BRYN BEATS THE NEEDLE."},
+      {t:12,  who:"Dilys",   x:"NEXT!"} ] },
+  { id:"p-end", name:"The End", dur:6,
+    subs:[ {t:2.2, who:"", x:"Nos da."} ] },
+];
+const TOTAL = SCENES.reduce((a,s)=>a+s.dur,0);
+const STARTS = []; SCENES.reduce((a,s)=>{ STARTS.push(a); return a+s.dur; },0);
+
+let idx=0, tOff=0, playing=false, lastTs=0, lastSub=-99;
+const stage=document.getElementById('stage'),
+      panels=[...document.querySelectorAll('.panel')],
+      sub=document.getElementById('sub'),
+      fill=document.getElementById('fill'),
+      lbl=document.getElementById('lbl'),
+      bPlay=document.getElementById('bPlay');
+
+let actx=null;
+function bloop(f0,f1,dur,type,gain){
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(), g=actx.createGain(), n=actx.currentTime;
+    o.type=type||"sine";
+    o.frequency.setValueAtTime(f0,n);
+    o.frequency.exponentialRampToValueAtTime(Math.max(40,f1),n+dur);
+    g.gain.setValueAtTime(gain||.05,n);
+    g.gain.exponentialRampToValueAtTime(.0001,n+dur);
+    o.connect(g); g.connect(actx.destination); o.start(n); o.stop(n+dur+.02);
+  }catch(e){}
+}
+const MUTE=false;
+
+function startScene(i, silent){
+  panels.forEach(p=>p.classList.remove('active'));
+  const p=panels[i];
+  void p.offsetWidth;
+  p.classList.add('active');
+  idx=i; tOff=0; lastSub=-99;
+  sub.textContent='';
+  lbl.textContent=`Scene ${i+1}/${SCENES.length} — ${SCENES[i].name}`;
+  if(!MUTE){ bloop(220,330,.14,"triangle",.05); setTimeout(()=>bloop(330,440,.14,"triangle",.05),150); }
+}
+
+function updateSub(off){
+  const s=SCENES[idx]; let best=null,bi=-1;
+  s.subs.forEach((l,i)=>{ if(off>=l.t){ best=l; bi=i; } });
+  if(bi===lastSub) return;
+  lastSub=bi;
+  if(best){
+    sub.innerHTML = best.who ? `<span class="who">${best.who}</span>${esc(best.x)}` : esc(best.x);
+    bloop(500,760,.09,"square",.025);
+  } else sub.textContent='';
+}
+function esc(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+
+function setFill(){
+  const start=idx===0?0:STARTS[idx];
+  fill.style.width=(Math.min(100,(start+tOff)/TOTAL*100)).toFixed(2)+'%';
+}
+
+function tick(ts){
+  if(playing){
+    const dt=Math.min(.05,(ts-lastTs)/1000); lastTs=ts; tOff+=dt;
+    if(tOff>=SCENES[idx].dur){
+      if(idx<SCENES.length-1) startScene(idx+1,false);
+      else { playing=false; bPlay.textContent='▶'; tOff=SCENES[idx].dur; setFill();
+        lbl.textContent='Finished — press play to watch again'; return; }
+    }
+    updateSub(tOff); setFill();
+  }
+  requestAnimationFrame(tick);
+}
+
+function play(){
+  if(playing){ stage.classList.add('paused'); playing=false; bPlay.textContent='▶'; return; }
+  stage.classList.remove('paused'); playing=true; bPlay.textContent='⏸';
+  lastTs=performance.now();
+  if(lbl.textContent.startsWith('Finished')) startScene(0,true);
+  bloop(440,660,.12,"triangle",.04);
+}
+function restart(){ startScene(0,true); stage.classList.remove('paused'); playing=true; bPlay.textContent='⏸'; lastTs=performance.now(); }
+
+bPlay.onclick=play;
+document.getElementById('bRestart').onclick=restart;
+document.getElementById('bSkip').onclick=()=>startScene((idx+1)%SCENES.length,false);
+document.getElementById('bar').onclick=e=>{
+  const r=e.currentTarget.getBoundingClientRect();
+  const pos=(e.clientX-r.left)/r.width*TOTAL;
+  let i=SCENES.length-1; for(let k=0;k<SCENES.length;k++){ if(STARTS[k]<=pos) i=k; }
+  startScene(i,false);
+};
+window.addEventListener('keydown',e=>{
+  if(e.code==='Space'){ e.preventDefault(); play(); }
+  else if(e.key==='ArrowRight') startScene((idx+1)%SCENES.length,false);
+  else if(/^[1-7]$/.test(e.key)) startScene(+e.key-1,false);
+});
+
+panels[0].classList.add('active');
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
