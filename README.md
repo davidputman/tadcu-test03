@@ -44,4 +44,4 @@ ledger eventually gets settled **in paw**.
 
 Same flat 2-D vector series language (HTML + CSS + SVG, no assets).
 Runtime ~82 seconds across 7 panels. © 2026 — Tadcu series. Production run
-`test03` of the Cwm Dwl production unit.
+`episode03` of the Cwm Dwl production unit.

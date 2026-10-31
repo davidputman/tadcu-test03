@@ -1,6 +1,6 @@
 # Tadcu — Episode 3: "The Vet"
 
-*Series: Tadcu · Episode 3 · Production: test03*
+*Series: Tadcu · Episode 3 · Production: episode03*
 
 ---
 
