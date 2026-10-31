@@ -20,7 +20,7 @@ straight to a scene.
 
 ## Story so far
 
-Episodes 1 & 2 are in `../test01` and `../test02`. Episode 2 ended with
+Episodes 1 & 2 are in `../episode01` and `../episode02`. Episode 2 ended with
 Bryn riding the parcel like a county trophy; this one begin with a promise
 made at the end: **an appointment neither of them will admit to being
 afraid of.**
