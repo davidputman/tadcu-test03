@@ -27,7 +27,7 @@ afraid of.**
 
 ## Episode 3 summary
 
-The Cwm Twp waiting room holds, today: one cat that hates everybody, one
+The Cwm Dwl waiting room holds, today: one cat that hates everybody, one
 farm magazine, and a dog doing an impression of a festival statue. Dilys
 the vet declares Bryn fit enough to evacuate a field; Tadcu disputes the
 forty-pound bill with eggs, tea, and personal Christmas cards; and the
@@ -35,7 +35,7 @@ ledger eventually gets settled **in paw**.
 
 ## New in this episode
 
-- **Dilys** — the vet of Cwm Twp surgery. Mint scrubs, ponytail, clipboard.
+- **Dilys** — the vet of Cwm Dwl surgery. Mint scrubs, ponytail, clipboard.
   Dispenses truths at only two speeds: "fit" and "paid".
 - **The Patient Zero Cat** — a basket, a blanket, two ears, a temper.
 - **The ledger** — where all disputes end, inked appropriately.
@@ -44,4 +44,4 @@ ledger eventually gets settled **in paw**.
 
 Same flat 2-D vector series language (HTML + CSS + SVG, no assets).
 Runtime ~82 seconds across 7 panels. © 2026 — Tadcu series. Production run
-`test03` of the Cwm Twp production unit.
+`test03` of the Cwm Dwl production unit.

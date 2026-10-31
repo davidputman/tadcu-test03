@@ -77,7 +77,7 @@ celebrate. Bryn wears his bandana.)*
 ### ⏱ 1:01.5 — END CARD (scene 7)
 
 **1:03.7**
-> **Nos da, Cwm Twp. And when the vet says "fit" — remember,
+> **Nos da, Cwm Dwl. And when the vet says "fit" — remember,
 > she means the tractor, and she means all of them.**
 
 *MUSIC OUT.*

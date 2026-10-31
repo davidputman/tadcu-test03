@@ -1,0 +1,57 @@
+[
+ {
+  "name": "Title",
+  "dur": 5.5,
+  "subs": [
+   0.8
+  ]
+ },
+ {
+  "name": "The Waiting Room",
+  "dur": 14.0,
+  "subs": [
+   0.6,
+   4.6,
+   8.8,
+   11.2
+  ]
+ },
+ {
+  "name": "The Examination",
+  "dur": 15.0,
+  "subs": [
+   0.8,
+   4.6,
+   9.2,
+   12.6
+  ]
+ },
+ {
+  "name": "The Bill",
+  "dur": 14.0,
+  "subs": [
+   0.8,
+   3.6,
+   7.2,
+   10.0,
+   12.6
+  ]
+ },
+ {
+  "name": "The Parade",
+  "dur": 13.0,
+  "subs": [
+   1.2,
+   4.6,
+   8.4,
+   12.0
+  ]
+ },
+ {
+  "name": "The End",
+  "dur": 6.0,
+  "subs": [
+   2.2
+  ]
+ }
+]

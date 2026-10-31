@@ -15,7 +15,7 @@ The valley at dawn, politely pretending nothing is coming.
 
 ### SCENE 1 — THE WAITING ROOM (0:05.5–0:19.5)
 
-**INT. CWM TWP SURGERY — MORNING**
+**INT. Cwm Dwl SURGERY — MORNING**
 
 Teal waiting room. Three chairs. A cat in a basket (red blanket, two ears,
 one grudge). Bryn sits like a statue in most of the middle chair, watching
@@ -78,7 +78,7 @@ clapping with their hooves (they don't have hands).
 **THE END.**
 
 > *Next episode: Tadcu builds a wall so good the girls can't get IN —
-> and Cwm Twp learns about chisels. Ymlaen!*
+> and Cwm Dwl learns about chisels. Ymlaen!*
 
 *Nos da.*
 
